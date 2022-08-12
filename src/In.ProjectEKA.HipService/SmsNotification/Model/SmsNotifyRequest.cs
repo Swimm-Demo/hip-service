@@ -1,18 +1,13 @@
+using In.ProjectEKA.HipService.Common.Model;
+
 namespace In.ProjectEKA.HipService.SmsNotification.Model
 {
     public class SmsNotifyRequest
     {
         public string phoneNo { get; }
-        
-        public string receiverName { get; }
-        
-        public string careContextInfo { get; }
-
-        public SmsNotifyRequest(string phoneNo, string receiverName, string careContextInfo)
+        public SmsNotifyRequest(string phoneNo)
         {
             this.phoneNo = phoneNo;
-            this.receiverName = receiverName;
-            this.careContextInfo = careContextInfo;
         }
     }
 }

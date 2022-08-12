@@ -15,8 +15,7 @@ namespace In.ProjectEKA.HipService.SmsNotification
             var timeStamp = DateTime.Now.ToUniversalTime();
             var requestId = Guid.NewGuid();
             var hip = new SmsNotifyHip(bahmniConfiguration.Id, bahmniConfiguration.Id);
-            var notification = new Model.SmsNotification(smsNotifyRequest.phoneNo, smsNotifyRequest.receiverName,
-                smsNotifyRequest.careContextInfo, null, hip);
+            var notification = new Model.SmsNotification(smsNotifyRequest.phoneNo,hip);
 
             return new Tuple<GatewaySmsNotifyRequestRepresentation, ErrorRepresentation>(
                 new GatewaySmsNotifyRequestRepresentation(requestId, timeStamp, notification), null);

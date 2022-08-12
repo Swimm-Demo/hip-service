@@ -59,7 +59,7 @@ namespace In.ProjectEKA.HipService.Common
         public const string PATH_ADD_NDHM_DEMOGRAPHICS = "/" + CURRENT_VERSION + "/hip/ndhm-demographics";
 
         public const string PATH_HIP_SMS_NOTIFY = "/" + CURRENT_VERSION + "/hip/patients/sms/notify";
-        public const string PATH_SMS_NOTIFY = "/" + CURRENT_VERSION + "/patients/sms/notify";
+        public const string PATH_SMS_NOTIFY = "/" + CURRENT_VERSION + "/patients/sms/notify2";
         public const string PATH_SMS_ON_NOTIFY = "/" + CURRENT_VERSION + "/patients/sms/on-notify";
 
         public const string REPORTING_SESSION = "reporting_session";

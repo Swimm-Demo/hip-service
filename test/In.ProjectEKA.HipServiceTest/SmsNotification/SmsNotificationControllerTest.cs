@@ -50,9 +50,6 @@ namespace In.ProjectEKA.HipServiceTest.SmsNotification
             var correlationId = Uuid.Generate().ToString();
             var smsNotificationAcknowledgement = new SmsNotificationAcknowledgement("success");
             var phoneNo = "123456789";
-            var receiverName = "abc";
-            var careContexxtInfo = "xyz";
-            var deepLinkurl = "url";
             var smsNotifyHip = new SmsNotifyHip("anc", "123");
 
             var onSmsContextRequest =
@@ -60,8 +57,7 @@ namespace In.ProjectEKA.HipServiceTest.SmsNotification
                     resp);
 
             var gatewaySmsNotifyRequestRepresentation = new GatewaySmsNotifyRepresentation(requestId, timeStamp,
-                new HipService.SmsNotification.Model.SmsNotification(phoneNo, receiverName, careContexxtInfo,
-                    deepLinkurl, smsNotifyHip));
+                new HipService.SmsNotification.Model.SmsNotification(phoneNo, smsNotifyHip));
 
             gatewayClient.Setup(
                     client =>
@@ -81,14 +77,10 @@ namespace In.ProjectEKA.HipServiceTest.SmsNotification
             var cmSuffix = "abc";
             var correlationId = Uuid.Generate().ToString();
             var phoneNo = "123456789";
-            var receiverName = "abc";
-            var careContexxtInfo = "xyz";
-            var deepLinkurl = "url";
             var smsNotifyHip = new SmsNotifyHip("anc", "123");
 
             var gatewaySmsNotifyRequestRepresentation = new GatewaySmsNotifyRepresentation(requestId, timeStamp,
-                new HipService.SmsNotification.Model.SmsNotification(phoneNo, receiverName, careContexxtInfo,
-                    deepLinkurl, smsNotifyHip));
+                new HipService.SmsNotification.Model.SmsNotification(phoneNo, smsNotifyHip));
 
 
             gatewayClient.Setup(
@@ -107,14 +99,10 @@ namespace In.ProjectEKA.HipServiceTest.SmsNotification
             var timeStamp = DateTime.Now.ToUniversalTime();
             var requestId = Guid.NewGuid();
             var phoneNo = "123456789";
-            var receiverName = "abc";
-            var careContexxtInfo = "xyz";
-            var deepLinkurl = "url";
             var smsNotifyHip = new SmsNotifyHip("anc", "123");
 
             var gatewaySmsNotifyRequestRepresentation = new GatewaySmsNotifyRepresentation(requestId, timeStamp,
-                new HipService.SmsNotification.Model.SmsNotification(phoneNo, receiverName, careContexxtInfo,
-                    deepLinkurl, smsNotifyHip));
+                new HipService.SmsNotification.Model.SmsNotification(phoneNo, smsNotifyHip));
 
             if (gatewaySmsNotifyRequestRepresentation != null)
                 return true;
@@ -142,14 +130,10 @@ namespace In.ProjectEKA.HipServiceTest.SmsNotification
         private bool shouldReturnSmsNotification()
         {
             var phoneNo = "123456789";
-            var receiverName = "abc";
-            var careContexxtInfo = "xyz";
-            var deepLinkurl = "url";
             var smsNotifyHip = new SmsNotifyHip("anc", "123");
 
             var smsNotification =
-                new HipService.SmsNotification.Model.SmsNotification(phoneNo, receiverName, careContexxtInfo,
-                    deepLinkurl, smsNotifyHip);
+                new HipService.SmsNotification.Model.SmsNotification(phoneNo,  smsNotifyHip);
             if (smsNotification != null)
                 return true;
             return false;
