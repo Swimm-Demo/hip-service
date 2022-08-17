@@ -20,8 +20,8 @@ namespace In.ProjectEKA.HipService.UserAuth.Model
             this.name = name;
             this.gender = gender;
             this.yearOfBirth = yearOfBirth;
-            this.monthOfBirth = monthOfBirth ?? 1;
-            this.dayOfBirth = dayOfBirth ?? 1;
+            this.monthOfBirth = monthOfBirth;
+            this.dayOfBirth = dayOfBirth;
             this.address = address;
             this.identifiers = identifiers;
         }
