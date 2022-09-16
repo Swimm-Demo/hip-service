@@ -71,7 +71,7 @@ namespace In.ProjectEKA.HipService.Patient
         private async Task<string> GetPrimaryContactUuid()
         {
             var request = new HttpRequestMessage(HttpMethod.Get,
-                _openMrsConfiguration.Url + PATH_OPENMRS_ATTRIBUTE_TYPE);
+                _openMrsConfiguration.Url + PATH_OPENMRS_ATTRIBUTE_TYPE + _openMrsConfiguration.PhoneNumber);
             var response = await _httpClient.SendAsync(request).ConfigureAwait(false);
             var content = await response.Content.ReadAsStringAsync();
             var jsonDoc = JsonDocument.Parse(content);

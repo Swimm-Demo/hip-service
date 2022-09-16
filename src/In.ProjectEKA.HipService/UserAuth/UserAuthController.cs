@@ -94,7 +94,7 @@ namespace In.ProjectEKA.HipService.UserAuth
                 var i = 0;
                 do
                 {
-                    Thread.Sleep(2000);
+                    Thread.Sleep(gatewayConfiguration.TimeOut);
                     if (RequestIdToErrorMessage.ContainsKey(requestId))
                     {
                         var gatewayError = RequestIdToErrorMessage[requestId];
@@ -195,7 +195,7 @@ namespace In.ProjectEKA.HipService.UserAuth
                 var i = 0;
                 do
                 {
-                    Thread.Sleep(2000);
+                    Thread.Sleep(gatewayConfiguration.TimeOut);
                     if (RequestIdToErrorMessage.ContainsKey(requestId))
                     {
                         var gatewayError = RequestIdToErrorMessage[requestId];
@@ -307,7 +307,7 @@ namespace In.ProjectEKA.HipService.UserAuth
                 var i = 0;
                 do
                 {
-                    Thread.Sleep(10000);
+                    Thread.Sleep(gatewayConfiguration.TimeOut + 8000);
                     if (RequestIdToErrorMessage.ContainsKey(requestId))
                     {
                         var gatewayError = RequestIdToErrorMessage[requestId];
