@@ -115,7 +115,7 @@ namespace In.ProjectEKA.HipService.UserAuth
                     }
 
                     i++;
-                } while (i < 5);
+                } while (i < gatewayConfiguration.Counter);
             }
             catch (Exception exception)
             {
@@ -224,7 +224,7 @@ namespace In.ProjectEKA.HipService.UserAuth
                     }
 
                     i++;
-                } while (i < 5);
+                } while (i < gatewayConfiguration.Counter);
             }
             catch (Exception exception)
             {
@@ -327,7 +327,7 @@ namespace In.ProjectEKA.HipService.UserAuth
                     }
 
                     i++;
-                } while (i < 5);
+                } while (i < gatewayConfiguration.Counter);
             }
             catch (Exception exception)
             {
