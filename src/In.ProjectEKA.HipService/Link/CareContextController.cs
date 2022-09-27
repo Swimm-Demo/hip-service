@@ -129,7 +129,7 @@ namespace In.ProjectEKA.HipService.Link
            {
             foreach (var context in newContextRequest.CareContexts)
             {
-                if (careContextService.IsLinkedContext(careContexts, context.Display))
+                if (careContextService.IsLinkedContext(careContexts, context.ReferenceNumber))
                 {
                     await careContextService.CallNotifyContext(newContextRequest, context);
                 }
