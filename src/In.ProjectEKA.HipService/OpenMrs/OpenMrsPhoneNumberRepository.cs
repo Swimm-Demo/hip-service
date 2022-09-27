@@ -7,9 +7,11 @@ namespace In.ProjectEKA.HipService.OpenMrs
     public class OpenMrsPhoneNumberRepository : IPhoneNumberRepository
     {
         private readonly IOpenMrsClient openMrsClient;
-        public OpenMrsPhoneNumberRepository(IOpenMrsClient openMrsClient)
+        private readonly OpenMrsConfiguration openMrsConfiguration;
+        public OpenMrsPhoneNumberRepository(IOpenMrsClient openMrsClient, OpenMrsConfiguration openMrsConfiguration)
         {
             this.openMrsClient = openMrsClient;
+            this.openMrsConfiguration = openMrsConfiguration;
         }
 
         public async Task<string> GetPhoneNumber(string patientReferenceNumber)
@@ -29,7 +31,7 @@ namespace In.ProjectEKA.HipService.OpenMrs
             {
                 var display = attributes[i].GetProperty("display");
                 var strlist = display.ToString().Split(" = ");
-                if (strlist[0] == "phoneNumber") {
+                if (strlist[0] == openMrsConfiguration.PhoneNumber) {
                     return strlist[1];
                 }
             }

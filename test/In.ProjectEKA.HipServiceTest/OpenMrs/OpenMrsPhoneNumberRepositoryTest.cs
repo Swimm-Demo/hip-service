@@ -14,7 +14,14 @@ namespace In.ProjectEKA.HipServiceTest.OpenMrs
         public async System.Threading.Tasks.Task GetPhoneNumber_ShouldExtractPrimaryContactFromPatientDataAsPhoneNumber_WhenSpecifyPatientId() {
             //Given
             var openmrsClientMock = new Mock<IOpenMrsClient>();
-            var repository = new OpenMrsPhoneNumberRepository(openmrsClientMock.Object);
+            var openmrsConfiguration = new OpenMrsConfiguration
+            {
+                Url = "https://someurl/openmrs/",
+                Username = "someusername",
+                Password = "somepassword",
+                PhoneNumber = "phoneNumber"
+            };
+            var repository = new OpenMrsPhoneNumberRepository(openmrsClientMock.Object,openmrsConfiguration);
             var patientId = "some-patient-id";
             var path = $"{Endpoints.OpenMrs.OnPatientPath}/{patientId}";
 
@@ -38,7 +45,14 @@ namespace In.ProjectEKA.HipServiceTest.OpenMrs
         public async System.Threading.Tasks.Task GetPhoneNumber_ShouldReturnNull_WhenThereIsNoPrimaryPhoneNumber() {
             //Given
             var openmrsClientMock = new Mock<IOpenMrsClient>();
-            var repository = new OpenMrsPhoneNumberRepository(openmrsClientMock.Object);
+            var openmrsConfiguration = new OpenMrsConfiguration
+            {
+                Url = "https://someurl/openmrs/",
+                Username = "someusername",
+                Password = "somepassword",
+                PhoneNumber = "phoneNumber"
+            };
+            var repository = new OpenMrsPhoneNumberRepository(openmrsClientMock.Object,openmrsConfiguration);
             var patientId = "some-patient-id";
             var path = $"{Endpoints.OpenMrs.OnPatientPath}/{patientId}";
 
