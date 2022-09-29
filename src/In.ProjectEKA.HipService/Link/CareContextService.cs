@@ -28,17 +28,19 @@ namespace In.ProjectEKA.HipService.Link
         private readonly BahmniConfiguration bahmniConfiguration;
         private readonly ILinkPatientRepository linkPatientRepository;
         private readonly OpenMrsConfiguration openMrsConfiguration;
+        private readonly LinkPatient linkPatient;
         private String HIP_URL;
 
         public CareContextService(HttpClient httpClient, IUserAuthRepository userAuthRepository,
             BahmniConfiguration bahmniConfiguration, ILinkPatientRepository linkPatientRepository,
-            OpenMrsConfiguration openMrsConfiguration)
+            OpenMrsConfiguration openMrsConfiguration, LinkPatient linkPatient)
         {
             this.httpClient = httpClient;
             this.userAuthRepository = userAuthRepository;
             this.bahmniConfiguration = bahmniConfiguration;
             this.linkPatientRepository = linkPatientRepository;
             this.openMrsConfiguration = openMrsConfiguration;
+            this.linkPatient = linkPatient;
         }
 
         private String getHipUrl()
@@ -47,8 +49,8 @@ namespace In.ProjectEKA.HipService.Link
             return HIP_URL;
         }
         
-        public Tuple<GatewayAddContextsRequestRepresentation, ErrorRepresentation> AddContextsResponse(
-            AddContextsRequest addContextsRequest)
+        public async Task<Tuple<GatewayAddContextsRequestRepresentation, ErrorRepresentation>> AddContextsResponse(
+            AddContextsRequest addContextsRequest, string cmSuffix)
         {
             var accessToken = GetAccessToken(addContextsRequest.ReferenceNumber).Result;
             var referenceNumber = addContextsRequest.ReferenceNumber;
@@ -58,6 +60,24 @@ namespace In.ProjectEKA.HipService.Link
             var link = new AddCareContextsLink(accessToken, patient);
             var timeStamp = DateTime.Now.ToUniversalTime();
             var requestId = Guid.NewGuid();
+            if (!await linkPatient.SaveInitiatedLinkRequest(requestId.ToString(), null, requestId.ToString())
+                .ConfigureAwait(false))
+                return new Tuple<GatewayAddContextsRequestRepresentation, ErrorRepresentation>
+                    (null, new ErrorRepresentation(new Error(ErrorCode.DuplicateRequestId, ErrorMessage.DuplicateRequestId)));
+            var careContextReferenceNumbers = addContextsRequest.CareContexts
+                .Select(context => context.ReferenceNumber)
+                .ToArray();
+            var (_, exception1) = await linkPatientRepository.SaveRequestWith(
+                    requestId.ToString(),
+                    cmSuffix,
+                    addContextsRequest.ConsentManagerUserId,
+                    addContextsRequest.ReferenceNumber,
+                    careContextReferenceNumbers)
+                .ConfigureAwait(false);
+            if (exception1 != null)
+                return new Tuple<GatewayAddContextsRequestRepresentation, ErrorRepresentation>
+                (null, new ErrorRepresentation(new Error(ErrorCode.ServerInternalError,
+                    ErrorMessage.DatabaseStorageError)));
             return new Tuple<GatewayAddContextsRequestRepresentation, ErrorRepresentation>
                 (new GatewayAddContextsRequestRepresentation(requestId, timeStamp, link), null);
         }
@@ -178,7 +198,8 @@ namespace In.ProjectEKA.HipService.Link
                 accessToken,
                 newContextRequest.PatientReferenceNumber,
                 newContextRequest.CareContexts,
-                newContextRequest.PatientName);
+                newContextRequest.PatientName,
+                newContextRequest.HealthId);
 
             request.Content = new StringContent(JsonConvert.SerializeObject(addContextRequest),
                 Encoding.UTF8, "application/json");

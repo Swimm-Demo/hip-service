@@ -7,14 +7,16 @@ namespace In.ProjectEKA.HipService.Link.Model
     {
         public string ReferenceNumber { get; }
         public string Display { get; }
+        public string ConsentManagerUserId { get; }
         public List<CareContextRepresentation> CareContexts { get; }
 
         public AddContextsRequest(string accessToken, string referenceNumber, List<CareContextRepresentation> careContexts,
-            string display)
+            string display, string consentManagerUserId)
         {
             ReferenceNumber = referenceNumber;
             CareContexts = careContexts;
             Display = display;
+            ConsentManagerUserId = consentManagerUserId;
         }
     }
 }

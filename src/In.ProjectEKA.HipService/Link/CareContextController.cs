@@ -42,12 +42,12 @@ namespace In.ProjectEKA.HipService.Link
             [FromHeader(Name = CORRELATION_ID)] string correlationId, [FromBody] AddContextsRequest addContextsRequest)
         {
             await careContextService.SetAccessToken(addContextsRequest.ReferenceNumber);
+            var cmSuffix = gatewayConfiguration.CmSuffix;
             var (gatewayAddContextsRequestRepresentation, error) =
-                careContextService.AddContextsResponse(addContextsRequest);
+               await careContextService.AddContextsResponse(addContextsRequest,cmSuffix);
             if (error != null)
                 return StatusCode(StatusCodes.Status400BadRequest, error);
             Guid requestId = gatewayAddContextsRequestRepresentation.RequestId;
-            var cmSuffix = gatewayConfiguration.CmSuffix;
             try
             {
                 logger.Log(LogLevel.Information,

@@ -181,7 +181,7 @@ namespace In.ProjectEKA.HipService.Link
             return linkedAccount.HasValue;
         }
 
-        private async Task<bool> SaveInitiatedLinkRequest(string requestId, string transactionId,
+        public async Task<bool> SaveInitiatedLinkRequest(string requestId, string transactionId,
             string linkReferenceNumber)
         {
             var savedLinkRequest = await linkPatientRepository.Save(requestId, transactionId, linkReferenceNumber)
