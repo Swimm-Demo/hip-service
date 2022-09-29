@@ -1,3 +1,5 @@
+using In.ProjectEKA.HipService.Patient.Model;
+
 namespace In.ProjectEKA.HipService.Link
 {
     using System;
@@ -151,7 +153,7 @@ namespace In.ProjectEKA.HipService.Link
         }
 
         [HttpPost(PATH_ON_ADD_CONTEXTS)]
-        public AcceptedResult HipLinkOnAddContexts(HipLinkContextConfirmation confirmation)
+        public async Task<AcceptedResult> HipLinkOnAddContexts(HipLinkContextConfirmation confirmation)
         {
             Log.Information("Link on-add-context received." +
                             $" RequestId:{confirmation.RequestId}, " +
@@ -160,7 +162,18 @@ namespace In.ProjectEKA.HipService.Link
                 Log.Information($" Error Code:{confirmation.Error.Code}," +
                                 $" Error Message:{confirmation.Error.Message}");
             else if (confirmation.Acknowledgement != null)
+            {
+                if (confirmation.Acknowledgement.Status.Equals(Status.SUCCESS.ToString()))
+                {
+                    var error =
+                        await linkPatient.VerifyAndLinkCareContexts(confirmation.Resp.RequestId);
+                    if (error != null)
+                    {
+                        Log.Error(error);
+                    }
+                }
                 Log.Information($" Acknowledgment Status:{confirmation.Acknowledgement.Status}");
+            }
             Log.Information($" Resp RequestId:{confirmation.Resp.RequestId}");
             return Accepted();
         }
