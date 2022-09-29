@@ -118,7 +118,7 @@ namespace In.ProjectEKA.HipService.Link
         {
             try
             {
-                var linkRequest = await linkPatientContext.LinkedAccounts
+                var linkRequest = await linkPatientContext.LinkedAccounts.OrderByDescending(i => i.DateTimeStamp)
                     .FirstOrDefaultAsync(request => request.PatientReferenceNumber.Equals(patientReferenceNumber));
                    if (linkRequest != null)
                    {
