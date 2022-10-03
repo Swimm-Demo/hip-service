@@ -38,7 +38,7 @@ namespace In.ProjectEKA.HipService.Patient
         {
             var requesId = shareProfileRequest.RequestId;
             var timeStamp = shareProfileRequest.Timestamp.ToString();
-            var patient = JsonConvert.SerializeObject(shareProfileRequest.Profile.PatientDemographics);
+            var patient = shareProfileRequest.Profile.PatientDemographics;
             var response = await Save(new PatientQueue(requesId, timeStamp, patient));
             if(response.HasValue)
                 Log.Information("Patient saved to queue");
