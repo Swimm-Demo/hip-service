@@ -94,7 +94,7 @@ namespace In.ProjectEKA.HipService.Patient
         {
             var profile = shareProfileRequest?.Profile;
             var demographics = profile?.PatientDemographics;
-            return demographics is {HealthIdNumber: { }, HealthId: { }, Identifiers: { }, Name: { },Gender:{}} && Enum.IsDefined(typeof(Gender), demographics.Gender) && demographics.YearOfBirth != 0;
+            return demographics is {HealthId: { }, Identifiers: { }, Name: { },Gender:{}} && Enum.IsDefined(typeof(Gender), demographics.Gender) && demographics.YearOfBirth != 0;
         }
 
         private async Task<bool> IsExist(string patientIdentifier)
