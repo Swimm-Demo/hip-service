@@ -8,8 +8,10 @@ using System.Threading.Tasks;
 using In.ProjectEKA.HipLibrary.Patient.Model;
 using In.ProjectEKA.HipService.Logger;
 using In.ProjectEKA.HipService.OpenMrs;
+using In.ProjectEKA.HipService.Patient.Database;
 using In.ProjectEKA.HipService.Patient.Model;
 using Newtonsoft.Json;
+using Optional;
 using Person = In.ProjectEKA.HipService.Patient.Model.Person;
 using Task = System.Threading.Tasks.Task;
 
@@ -23,48 +25,37 @@ namespace In.ProjectEKA.HipService.Patient
         private const string Nat = "NAT";
         private readonly HttpClient _httpClient;
         private readonly OpenMrsConfiguration _openMrsConfiguration;
+        private readonly PatientContext patientContext;
 
-        public PatientProfileService(HttpClient httpClient, OpenMrsConfiguration openMrsConfiguration)
+        public PatientProfileService(HttpClient httpClient, OpenMrsConfiguration openMrsConfiguration, PatientContext patientContext)
         {
             this._httpClient = httpClient;
             this._openMrsConfiguration = openMrsConfiguration;
+            this.patientContext = patientContext;
         }
 
         public async Task SavePatient(ShareProfileRequest shareProfileRequest)
         {
-            var name = shareProfileRequest.Profile.PatientDemographics.Name.Split(" ");
-            var gender = shareProfileRequest.Profile.PatientDemographics.Gender;
-            var address = shareProfileRequest.Profile.PatientDemographics.Address;
-            var healthId = shareProfileRequest.Profile.PatientDemographics.HealthId;
-            var healthNumber = shareProfileRequest.Profile.PatientDemographics.HealthIdNumber;
-            var personIdentifiers = shareProfileRequest.Profile.PatientDemographics.Identifiers;
+            var requesId = shareProfileRequest.RequestId;
+            var timeStamp = shareProfileRequest.Timestamp.ToString();
+            var patient = JsonConvert.SerializeObject(shareProfileRequest.Profile.PatientDemographics);
+            var response = await Save(new PatientQueue(requesId, timeStamp, patient));
+            if(response.HasValue)
+                Log.Information("Patient saved to queue");
+        }
 
-            if (!await IsExist(healthNumber) && !await IsExist(healthId))
+        private async Task<Option<PatientQueue>> Save(PatientQueue patientQueue)
+        {
+            try
             {
-                var primaryContactUuid = await GetPrimaryContactUuid();
-                var primaryContact = GetPrimaryContact(personIdentifiers);
-                var identifiers = await GetIdentifiers(healthNumber, healthId);
-                var patientName = GetName(name);
-                var patientAddress = address != null
-                    ? new PatientAddress(address.Line, address.District, address.State)
-                    : new PatientAddress("", "", "");
-                var dateOfBirth = GetDateOfBirth(shareProfileRequest.Profile.PatientDemographics);
-                var attributeType = new AttributeType(primaryContactUuid);
-                var attribute = new PatientAttribute(attributeType, primaryContact);
-                var person = new Person(new List<PatientName>() {patientName},
-                    new List<PatientAddress>() {patientAddress},
-                    dateOfBirth, gender.ToString(), new List<PatientAttribute>() {attribute});
-                var openMrsPatient = new OpenMrsPatient(person,
-                    identifiers);
-                var patientProfileRequest = new PatientProfileRequest(openMrsPatient, new List<object>());
-                var request = new HttpRequestMessage(HttpMethod.Post,
-                    _openMrsConfiguration.Url + PATH_PATIENT_PROFILE_OPENMRS);
-                request.Content = new StringContent(JsonConvert.SerializeObject(patientProfileRequest),
-                    Encoding.UTF8, "application/json");
-
-                var response = await _httpClient.SendAsync(request).ConfigureAwait(false);
-                var content = await response.Content.ReadAsStringAsync();
-                Log.Information(content);
+                await patientContext.PatientQueue.AddAsync(patientQueue).ConfigureAwait(false);
+                await patientContext.SaveChangesAsync();
+                return Option.Some(patientQueue);
+            }
+            catch (Exception exception)
+            {
+                Log.Fatal(exception, exception.StackTrace);
+                return Option.None<PatientQueue>();
             }
         }
 
