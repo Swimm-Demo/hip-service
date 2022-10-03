@@ -10,9 +10,7 @@ using In.ProjectEKA.HipService.Logger;
 using In.ProjectEKA.HipService.OpenMrs;
 using In.ProjectEKA.HipService.Patient.Database;
 using In.ProjectEKA.HipService.Patient.Model;
-using Newtonsoft.Json;
 using Optional;
-using Person = In.ProjectEKA.HipService.Patient.Model.Person;
 using Task = System.Threading.Tasks.Task;
 
 namespace In.ProjectEKA.HipService.Patient
@@ -164,5 +162,25 @@ namespace In.ProjectEKA.HipService.Patient
                 _ => new PatientName(name[0], null, null)
             };
         }
+        
+        public async Task<List<PatientQueue>> GetPatientQueue()
+        {
+            try
+            {
+                var patientQueueRequest = patientContext.PatientQueue.ToList();
+                if (patientQueueRequest != null)
+                {
+                    return patientQueueRequest;
+                }
+                return new List<PatientQueue>();
+            }
+            catch (Exception exception)
+            {
+                Log.Fatal(exception, exception.StackTrace);
+                return new List<PatientQueue>();
+            }
+        }
+
+  
     }
 }

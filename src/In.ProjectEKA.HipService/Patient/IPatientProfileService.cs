@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using In.ProjectEKA.HipService.Patient.Model;
 
@@ -7,5 +8,6 @@ namespace In.ProjectEKA.HipService.Patient
     {
         Task SavePatient(ShareProfileRequest shareProfileRequest);
         bool IsValidRequest(ShareProfileRequest shareProfileRequest);
+        Task<List<PatientQueue>> GetPatientQueue();
     }
 }

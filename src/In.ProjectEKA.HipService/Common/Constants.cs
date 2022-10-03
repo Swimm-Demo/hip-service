@@ -73,5 +73,6 @@ namespace In.ProjectEKA.HipService.Common
         public const string PATH_PATIENT_ON_NOTIFY = "/" + CURRENT_VERSION + "/patients/status/on-notify";
         public const string PATH_PROFILE_SHARE = "/" + CURRENT_VERSION + "/patients/profile/share";
         public const string PATH_PROFILE_ON_SHARE = "/" + CURRENT_VERSION + "/patients/profile/on-share";
+        public const string PATH_PROFILE_FETCH = "/" + CURRENT_VERSION + "/patients/profile/fetch";
     }
 }
