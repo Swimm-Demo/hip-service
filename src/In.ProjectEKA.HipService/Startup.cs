@@ -1,6 +1,7 @@
 using In.ProjectEKA.HipService.Common.Model;
 using In.ProjectEKA.HipService.Link.Model;
 using In.ProjectEKA.HipService.Patient;
+using In.ProjectEKA.HipService.Patient.Database;
 using In.ProjectEKA.HipService.Patient.Model;
 using In.ProjectEKA.HipService.SmsNotification;
 using In.ProjectEKA.HipService.UserAuth;
@@ -103,6 +104,9 @@ namespace In.ProjectEKA.HipService
                     options.UseNpgsql(Configuration.GetConnectionString("DefaultConnection"),
                         x => x.MigrationsAssembly("In.ProjectEKA.HipService")))
                 .AddDbContext<ConsentContext>(options =>
+                    options.UseNpgsql(Configuration.GetConnectionString("DefaultConnection"),
+                        x => x.MigrationsAssembly("In.ProjectEKA.HipService")))
+                .AddDbContext<PatientContext>(options =>
                     options.UseNpgsql(Configuration.GetConnectionString("DefaultConnection"),
                         x => x.MigrationsAssembly("In.ProjectEKA.HipService")))
                 .AddHangfire(config => { config.UseMemoryStorage(); })
@@ -277,6 +281,8 @@ namespace In.ProjectEKA.HipService
             authContext.Database.Migrate();
             var ndhmContext = serviceScope.ServiceProvider.GetService<NdhmDemographicsContext>();
             ndhmContext.Database.Migrate();
+            var patientContext = serviceScope.ServiceProvider.GetService<PatientContext>();
+            patientContext.Database.Migrate();
         }
 
         private static bool CheckRoleInAccessToken(JwtSecurityToken accessToken)
