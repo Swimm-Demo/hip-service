@@ -31,6 +31,9 @@ namespace In.ProjectEKA.HipService.Migrations
                     .HasColumnType("text")
                     .HasDefaultValueSql("now()");
                 
+                b.Property<string>("HipCode")
+                    .HasColumnType("text");
+                
                 b.Property<string>("Profile")
                     .HasColumnType("text");
                 

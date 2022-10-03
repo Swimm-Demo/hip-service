@@ -20,6 +20,7 @@ namespace In.ProjectEKA.HipService.Patient.Database
                 builder.HasKey(p => p.RequestId);
                 builder.Property(p => p.RequestId);
                 builder.Property(p => p.DateTimeStamp);
+                builder.Property(p => p.HipCode);
                 builder.Property(p => p.Profile).HasConversion(
                     v => JsonConvert.SerializeObject(v,
                         new JsonSerializerSettings {NullValueHandling = NullValueHandling.Ignore}),

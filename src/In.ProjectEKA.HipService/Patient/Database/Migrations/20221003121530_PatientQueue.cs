@@ -12,6 +12,7 @@ namespace In.ProjectEKA.HipService.Migrations
                 {
                     RequestId = table.Column<string>(nullable: false),
                     DateTimeStamp = table.Column<string>(nullable: true),
+                    HipCode = table.Column<string>(nullable: true),
                     Profile = table.Column<string>(nullable: true)
                 },
                 constraints: table =>
