@@ -34,15 +34,9 @@ namespace In.ProjectEKA.HipService.Common
         public static readonly string PATH_OPENMRS_FHIR = "ws/fhir2/R4/Patient";
         public static readonly string PATH_OPENMRS_REST = "ws/rest/v1/visit";
         public static readonly string PATH_OPENMRS_HITYPE = "ws/rest/v1/hip/";
-        public static readonly string PATH_PATIENT_PROFILE_OPENMRS = "ws/rest/v1/bahmnicore/patientprofile";
-        public static readonly string PATH_OPENMRS_IDENTIFIER_TYPE = "ws/rest/v1/idgen/identifiertype";
-        public static readonly string PATH_OPENMRS_ATTRIBUTE_TYPE =
-            "/ws/rest/v1/personattributetype?v=default&q=";
-        public static readonly string PATH_OPENMRS_EXISTING_HEALTHID = PATH_OPENMRS_HITYPE + "existingPatients/";
         public static readonly string CONFIG_KEY = "OpenMrs";
 
         public const string CORRELATION_ID = "CORRELATION-ID";
-        public const string PATH_PATIENT_PROFILE_SHARE = "/" + CURRENT_VERSION + "/patients/profile/share";
         public const string PATH_PATIENT_PROFILE_ON_SHARE = "/" + CURRENT_VERSION + "/patients/profile/on-share";
         public const string PATH_FETCH_AUTH_MODES = "/" + CURRENT_VERSION + "/users/auth/fetch-modes";
         public const string PATH_ADD_PATIENT_CONTEXTS = "/" + CURRENT_VERSION + "/links/link/add-contexts";
