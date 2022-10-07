@@ -10,5 +10,7 @@ namespace In.ProjectEKA.HipService.OpenMrs
         
         
         public string PhoneNumber { get; set; }
+        public int PatientQueueTimeLimit { get; set; }
+
     }
 }
