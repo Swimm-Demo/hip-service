@@ -1,4 +1,6 @@
 using System;
+using System.IdentityModel.Tokens.Jwt;
+using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -110,11 +112,21 @@ namespace In.ProjectEKA.HipService.UserAuth
             return UserAuthMap.HealthIdToTransactionId.ContainsKey(healthId);
         }
 
+        private string getHealthId(string accessToken)
+        {
+            var token = new JwtSecurityTokenHandler().ReadToken(accessToken) as JwtSecurityToken;
+            return token?.Claims.First(c => c.Type == "patientId").Value;
+        }
+
         public async Task<Tuple<AuthConfirm, ErrorRepresentation>> OnAuthConfirmResponse(
             OnAuthConfirmRequest onAuthConfirmRequest)
         {
             var accessToken = onAuthConfirmRequest.auth.accessToken;
             var healthId = onAuthConfirmRequest.auth.patient.id;
+            if(healthId == null)
+            {
+                healthId = getHealthId(onAuthConfirmRequest.auth.accessToken);
+            }
             var authConfirm = new AuthConfirm(healthId, accessToken);
             var savedAuthConfirm = userAuthRepository.Get(healthId).Result;
             if (savedAuthConfirm.Equals(Option.Some<AuthConfirm>(null)))

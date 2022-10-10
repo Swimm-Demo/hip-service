@@ -96,16 +96,12 @@ namespace In.ProjectEKA.HipService.Link
         {
             var (healthId, exception) =
                 await linkPatientRepository.GetHealthID(patientReferenceNumber);
+            await CallAuthInit(healthId);
+            await CallAuthConfirm(healthId);
             if (!UserAuthMap.HealthIdToAccessToken.TryGetValue(healthId, out _))
             {
                 var (accessToken, error) = await userAuthRepository.GetAccessToken(healthId);
                 UserAuthMap.HealthIdToAccessToken.Add(healthId, accessToken);
-            }
-
-            if (IsExpired(UserAuthMap.HealthIdToAccessToken[healthId]))
-            {
-                await CallAuthInit(healthId);
-                await CallAuthConfirm(healthId);
             }
         }
 
