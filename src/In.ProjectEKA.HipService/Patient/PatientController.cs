@@ -70,5 +70,14 @@ namespace In.ProjectEKA.HipService.Patient
                return Accepted(); 
             return BadRequest();
         }
+        
+        [Route(PATH_PROFILE_FETCH)]
+        public async Task<ActionResult> GetDetails()
+        {
+            var patientQueueResult = await _patientProfileService.GetPatientQueue();
+            return Accepted(patientQueueResult);
+        }
+
+        
     }
 }
