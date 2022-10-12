@@ -181,12 +181,40 @@ namespace In.ProjectEKA.HipService.Link
             return linkedAccount.HasValue;
         }
 
-        private async Task<bool> SaveInitiatedLinkRequest(string requestId, string transactionId,
+        public async Task<bool> SaveInitiatedLinkRequest(string requestId, string transactionId,
             string linkReferenceNumber)
         {
             var savedLinkRequest = await linkPatientRepository.Save(requestId, transactionId, linkReferenceNumber)
                 .ConfigureAwait(false);
             return savedLinkRequest.HasValue;
+        }
+        public async Task<ErrorRepresentation> VerifyAndLinkCareContexts(String requestId)
+        {
+            var (linkEnquires, exception) =
+                await linkPatientRepository.GetPatientFor(requestId);
+            var cmId = "";
+            if (exception != null)
+                return new ErrorRepresentation(new Error(ErrorCode.NoLinkRequestFound, ErrorMessage.NoLinkRequestFound));
+            cmId = linkEnquires.ConsentManagerId;
+            var patient = await patientRepository.PatientWithAsync(linkEnquires.PatientReferenceNumber);
+            return await patient.Map( async patient =>
+                {
+                    var savedLinkRequests = await linkPatientRepository.Get(requestId);
+                    savedLinkRequests.MatchSome(linkRequests =>
+                    {
+                        foreach (var linkRequest in linkRequests)
+                        {
+                            linkRequest.Status = true;
+                            linkPatientRepository.Update(linkRequest);
+                        }
+                    });
+                    return await SaveLinkedAccounts(linkEnquires,patient.Uuid)
+                        ? (ErrorRepresentation) null
+                        : new ErrorRepresentation(new Error(ErrorCode.NoPatientFound,
+                                ErrorMessage.NoPatientFound));
+                }).ValueOr(
+                Task.FromResult<ErrorRepresentation>(new ErrorRepresentation(new Error(ErrorCode.CareContextNotFound,
+                        ErrorMessage.CareContextNotFound))));
         }
     }
 }
