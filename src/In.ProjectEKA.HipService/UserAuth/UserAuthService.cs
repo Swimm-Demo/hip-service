@@ -1,26 +1,38 @@
 using System;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
+using System.Net.Http;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using In.ProjectEKA.HipLibrary.Patient.Model;
+using In.ProjectEKA.HipService.Common;
 using In.ProjectEKA.HipService.Common.Model;
 using In.ProjectEKA.HipService.DataFlow;
+using In.ProjectEKA.HipService.Logger;
 using In.ProjectEKA.HipService.UserAuth.Model;
+using Microsoft.Extensions.Options;
+using Newtonsoft.Json;
 using Optional;
+using Optional.Unsafe;
 using static In.ProjectEKA.HipService.Common.Constants;
+using Error = In.ProjectEKA.HipLibrary.Patient.Model.Error;
+using HttpMethod = System.Net.Http.HttpMethod;
+using Identifier = In.ProjectEKA.HipService.UserAuth.Model.Identifier;
 
 namespace In.ProjectEKA.HipService.UserAuth
 {
     public class UserAuthService : IUserAuthService
     {
         private readonly IUserAuthRepository userAuthRepository;
+        private readonly HttpClient httpClient;
+        private readonly IOptions<HipConfiguration> hipConfiguration;
 
-        public UserAuthService(IUserAuthRepository userAuthRepository)
+        public UserAuthService(IUserAuthRepository userAuthRepository, HttpClient httpClient, IOptions<HipConfiguration> hipConfiguration)
         {
             this.userAuthRepository = userAuthRepository;
-
+            this.httpClient = httpClient;
+            this.hipConfiguration = hipConfiguration;
         }
         public Tuple<GatewayFetchModesRequestRepresentation, ErrorRepresentation> FetchModeResponse(
             FetchRequest fetchRequest, BahmniConfiguration bahmniConfiguration)
@@ -163,6 +175,44 @@ namespace In.ProjectEKA.HipService.UserAuth
         public async Task Dump(NdhmDemographics ndhmDemographics)
         {
             await userAuthRepository.AddDemographics(ndhmDemographics).ConfigureAwait(false);
+        }
+
+        public async Task CallAuthConfirm(string healthId)
+        {
+            try
+            {
+                var request = new HttpRequestMessage(HttpMethod.Post, hipConfiguration.Value.Url + PATH_HIP_AUTH_CONFIRM);
+                var ndhmDemographics = (userAuthRepository.GetDemographics(healthId).Result).ValueOrDefault();
+                var identifier = new Identifier(MOBILE, ndhmDemographics.PhoneNumber);
+                var demographics = new Demographics(ndhmDemographics.Name, ndhmDemographics.Gender,
+                    ndhmDemographics.DateOfBirth, identifier);
+                var authConfirmRequest = new AuthConfirmRequest(null, healthId, demographics);
+                request.Content = new StringContent(JsonConvert.SerializeObject(authConfirmRequest),
+                    Encoding.UTF8, "application/json");
+                await httpClient.SendAsync(request).ConfigureAwait(false);
+                Log.Information(request.ToString());
+            }
+            catch (Exception)
+            {
+                // ignored
+            }
+        }
+        
+        public async Task CallAuthInit(string healthId)
+        {
+            Log.Information($"{hipConfiguration.Value.Url} url");
+            try
+            {
+                var request = new HttpRequestMessage(HttpMethod.Post, hipConfiguration.Value.Url + PATH_HIP_AUTH_INIT);
+                var authInitRequest = new AuthInitRequest(healthId, "DEMOGRAPHICS", "KYC_AND_LINK");
+                request.Content = new StringContent(JsonConvert.SerializeObject(authInitRequest), Encoding.UTF8,
+                    "application/json");
+                await httpClient.SendAsync(request).ConfigureAwait(false);
+            }
+            catch (Exception)
+            {
+                // ignored
+            }
         }
     }
 }
