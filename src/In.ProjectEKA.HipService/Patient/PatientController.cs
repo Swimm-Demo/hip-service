@@ -16,6 +16,7 @@ namespace In.ProjectEKA.HipService.Patient
         private readonly GatewayConfiguration _gatewayConfiguration;
         private readonly IPatientProfileService _patientProfileService;
 
+
         public PatientController(GatewayClient gatewayClient, IPatientNotificationService patientNotificationService,
             GatewayConfiguration gatewayConfiguration, IPatientProfileService patientProfileService)
         {
@@ -71,8 +72,11 @@ namespace In.ProjectEKA.HipService.Patient
                 gatewayResponse,
                 cmSuffix,
                 correlationId);
-            if(error == null)
-               return Accepted(); 
+            if (error == null)
+            {
+                await _patientProfileService.linkToken(shareProfileRequest.Profile.PatientDemographics.HealthId);
+                return Accepted();
+            }
             return BadRequest();
         }
         

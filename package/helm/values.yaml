@@ -23,7 +23,7 @@ config:
   BAHMNI_URL: ""
   GATEWAY_CMSUFFIX: "sbx"
   OTPSERVICE_URL: "http://otp-service:80"
-  HIP_URL: "https://dev.lite.mybahmni.in/hiprovider"
+  HIP_URL: "http://hip:8000"
   HEALTH_CHECK_DURATION: 30000
   CORS_ALLOWED_ORIGIN: ""
   CONNECTION_STRING: "Host=bahmni-dev-postgresql;Port=5432;Username=postgres;Password=welcome;Database=hipservice"

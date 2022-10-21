@@ -4,26 +4,32 @@ using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
 using In.ProjectEKA.HipLibrary.Patient.Model;
+using In.ProjectEKA.HipService.Common;
 using In.ProjectEKA.HipService.Logger;
 using In.ProjectEKA.HipService.OpenMrs;
 using In.ProjectEKA.HipService.Patient.Database;
 using In.ProjectEKA.HipService.Patient.Model;
+using Microsoft.Extensions.Options;
 using Optional;
 using Optional.Unsafe;
 using Task = System.Threading.Tasks.Task;
 
 namespace In.ProjectEKA.HipService.Patient
 {
-
+    using static Common.Constants;
     public class PatientProfileService : IPatientProfileService
     {
         private readonly OpenMrsConfiguration _openMrsConfiguration;
         private readonly PatientContext patientContext;
+        private readonly IOptions<HipConfiguration> hipConfiguration;
+        private readonly HttpClient httpClient;
 
-        public PatientProfileService(OpenMrsConfiguration openMrsConfiguration, PatientContext patientContext)
+        public PatientProfileService(OpenMrsConfiguration openMrsConfiguration, PatientContext patientContext, IOptions<HipConfiguration> hipConfiguration, HttpClient httpClient)
         {
             this._openMrsConfiguration = openMrsConfiguration;
             this.patientContext = patientContext;
+            this.hipConfiguration = hipConfiguration;
+            this.httpClient = httpClient;
         }
 
         public async Task<int> SavePatient(ShareProfileRequest shareProfileRequest)
@@ -73,6 +79,12 @@ namespace In.ProjectEKA.HipService.Patient
                 Log.Fatal(exception, exception.StackTrace);
                 return new List<PatientQueue>();
             }
+        }
+
+        public async Task linkToken(string healthId)
+        {
+            var request = new HttpRequestMessage(HttpMethod.Get, hipConfiguration.Value.Url + PATH_ADD_TOKEN + "?healthId=" + healthId);
+            await httpClient.SendAsync(request).ConfigureAwait(false);
         }
 
   
