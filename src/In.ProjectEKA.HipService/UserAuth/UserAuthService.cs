@@ -10,8 +10,8 @@ using In.ProjectEKA.HipService.Common;
 using In.ProjectEKA.HipService.Common.Model;
 using In.ProjectEKA.HipService.DataFlow;
 using In.ProjectEKA.HipService.Logger;
+using In.ProjectEKA.HipService.OpenMrs;
 using In.ProjectEKA.HipService.UserAuth.Model;
-using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using Optional;
 using Optional.Unsafe;
@@ -20,19 +20,20 @@ using Error = In.ProjectEKA.HipLibrary.Patient.Model.Error;
 using HttpMethod = System.Net.Http.HttpMethod;
 using Identifier = In.ProjectEKA.HipService.UserAuth.Model.Identifier;
 
+
 namespace In.ProjectEKA.HipService.UserAuth
 {
     public class UserAuthService : IUserAuthService
     {
         private readonly IUserAuthRepository userAuthRepository;
         private readonly HttpClient httpClient;
-        private readonly IOptions<HipConfiguration> hipConfiguration;
+        private readonly HipUrlHelper helper;
 
-        public UserAuthService(IUserAuthRepository userAuthRepository, HttpClient httpClient, IOptions<HipConfiguration> hipConfiguration)
+        public UserAuthService(IUserAuthRepository userAuthRepository, HttpClient httpClient, HipUrlHelper helper)
         {
             this.userAuthRepository = userAuthRepository;
             this.httpClient = httpClient;
-            this.hipConfiguration = hipConfiguration;
+            this.helper = helper;
         }
         public Tuple<GatewayFetchModesRequestRepresentation, ErrorRepresentation> FetchModeResponse(
             FetchRequest fetchRequest, BahmniConfiguration bahmniConfiguration)
@@ -181,7 +182,7 @@ namespace In.ProjectEKA.HipService.UserAuth
         {
             try
             {
-                var request = new HttpRequestMessage(HttpMethod.Post, hipConfiguration.Value.Url + PATH_HIP_AUTH_CONFIRM);
+                var request = new HttpRequestMessage(HttpMethod.Post, helper.getHipUrl() + PATH_HIP_AUTH_CONFIRM);
                 var ndhmDemographics = (userAuthRepository.GetDemographics(healthId).Result).ValueOrDefault();
                 var identifier = new Identifier(MOBILE, ndhmDemographics.PhoneNumber);
                 var demographics = new Demographics(ndhmDemographics.Name, ndhmDemographics.Gender,
@@ -200,10 +201,9 @@ namespace In.ProjectEKA.HipService.UserAuth
         
         public async Task CallAuthInit(string healthId)
         {
-            Log.Information($"{hipConfiguration.Value.Url} url");
             try
             {
-                var request = new HttpRequestMessage(HttpMethod.Post, hipConfiguration.Value.Url + PATH_HIP_AUTH_INIT);
+                var request = new HttpRequestMessage(HttpMethod.Post, helper.getHipUrl() + PATH_HIP_AUTH_INIT);
                 var authInitRequest = new AuthInitRequest(healthId, "DEMOGRAPHICS", "KYC_AND_LINK");
                 request.Content = new StringContent(JsonConvert.SerializeObject(authInitRequest), Encoding.UTF8,
                     "application/json");

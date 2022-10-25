@@ -9,7 +9,6 @@ using In.ProjectEKA.HipService.Logger;
 using In.ProjectEKA.HipService.OpenMrs;
 using In.ProjectEKA.HipService.Patient.Database;
 using In.ProjectEKA.HipService.Patient.Model;
-using Microsoft.Extensions.Options;
 using Optional;
 using Optional.Unsafe;
 using Task = System.Threading.Tasks.Task;
@@ -21,15 +20,15 @@ namespace In.ProjectEKA.HipService.Patient
     {
         private readonly OpenMrsConfiguration _openMrsConfiguration;
         private readonly PatientContext patientContext;
-        private readonly IOptions<HipConfiguration> hipConfiguration;
         private readonly HttpClient httpClient;
+        private readonly HipUrlHelper helper;
 
-        public PatientProfileService(OpenMrsConfiguration openMrsConfiguration, PatientContext patientContext, IOptions<HipConfiguration> hipConfiguration, HttpClient httpClient)
+        public PatientProfileService(OpenMrsConfiguration openMrsConfiguration, PatientContext patientContext, HttpClient httpClient, HipUrlHelper helper)
         {
             this._openMrsConfiguration = openMrsConfiguration;
             this.patientContext = patientContext;
-            this.hipConfiguration = hipConfiguration;
             this.httpClient = httpClient;
+            this.helper = helper;
         }
 
         public async Task<int> SavePatient(ShareProfileRequest shareProfileRequest)
@@ -83,7 +82,7 @@ namespace In.ProjectEKA.HipService.Patient
 
         public async Task linkToken(string healthId)
         {
-            var request = new HttpRequestMessage(HttpMethod.Get, hipConfiguration.Value.Url + PATH_ADD_TOKEN + "?healthId=" + healthId);
+            var request = new HttpRequestMessage(HttpMethod.Get,  helper.getHipUrl() + PATH_ADD_TOKEN + "?healthId=" + healthId);
             await httpClient.SendAsync(request).ConfigureAwait(false);
         }
 

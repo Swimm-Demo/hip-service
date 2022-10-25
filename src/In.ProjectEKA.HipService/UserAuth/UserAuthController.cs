@@ -15,7 +15,6 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using static In.ProjectEKA.HipService.UserAuth.UserAuthMap;
-using Log = In.ProjectEKA.HipService.Logger.Log;
 
 namespace In.ProjectEKA.HipService.UserAuth
 {
@@ -394,14 +393,12 @@ namespace In.ProjectEKA.HipService.UserAuth
             var ndhmDemographics = new NdhmDemographics(healthId, name, gender, dateOfBirth, phoneNumber);
             await userAuthService.Dump(ndhmDemographics);
         }
-        
+
         [Route(PATH_ADD_TOKEN)]
         public async Task AddAuthToken(string healthId)
         {
             await userAuthService.CallAuthInit(healthId);
             await userAuthService.CallAuthConfirm(healthId);
         }
-
-        
     }
 }
