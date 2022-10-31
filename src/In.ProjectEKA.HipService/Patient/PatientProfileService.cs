@@ -2,13 +2,17 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
+using System.Text;
 using System.Threading.Tasks;
+using Hl7.Fhir.Model;
 using In.ProjectEKA.HipLibrary.Patient.Model;
 using In.ProjectEKA.HipService.Common;
 using In.ProjectEKA.HipService.Logger;
 using In.ProjectEKA.HipService.OpenMrs;
 using In.ProjectEKA.HipService.Patient.Database;
 using In.ProjectEKA.HipService.Patient.Model;
+using In.ProjectEKA.HipService.UserAuth.Model;
+using Newtonsoft.Json;
 using Optional;
 using Optional.Unsafe;
 using Task = System.Threading.Tasks.Task;
@@ -80,9 +84,16 @@ namespace In.ProjectEKA.HipService.Patient
             }
         }
 
-        public async Task linkToken(string healthId)
+        public async Task linkToken(PatientDemographics patientDemographics)
         {
-            var request = new HttpRequestMessage(HttpMethod.Get,  helper.getHipUrl() + PATH_ADD_TOKEN + "?healthId=" + healthId);
+            var dob = new Date(patientDemographics.YearOfBirth, patientDemographics.MonthOfBirth ?? 1,
+                patientDemographics.DayOfBirth ?? 1).ToString();
+            var ndhmDemograhics = new NdhmDemographics(patientDemographics.HealthId, patientDemographics.Name,
+                patientDemographics.Gender,
+                dob, patientDemographics.Identifiers[0].Value);
+            var request = new HttpRequestMessage(HttpMethod.Post, helper.getHipUrl() + PATH_DEMOGRAPHICS);
+            request.Content = new StringContent(JsonConvert.SerializeObject(ndhmDemograhics), Encoding.UTF8,
+                "application/json");
             await httpClient.SendAsync(request).ConfigureAwait(false);
         }
 
