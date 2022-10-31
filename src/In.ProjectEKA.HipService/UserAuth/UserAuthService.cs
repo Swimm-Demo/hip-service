@@ -178,20 +178,18 @@ namespace In.ProjectEKA.HipService.UserAuth
             await userAuthRepository.AddDemographics(ndhmDemographics).ConfigureAwait(false);
         }
 
-        public async Task CallAuthConfirm(string healthId)
+        public async Task CallAuthConfirm(NdhmDemographics ndhmDemographics)
         {
             try
             {
                 var request = new HttpRequestMessage(HttpMethod.Post, helper.getHipUrl() + PATH_HIP_AUTH_CONFIRM);
-                var ndhmDemographics = (userAuthRepository.GetDemographics(healthId).Result).ValueOrDefault();
                 var identifier = new Identifier(MOBILE, ndhmDemographics.PhoneNumber);
                 var demographics = new Demographics(ndhmDemographics.Name, ndhmDemographics.Gender,
                     ndhmDemographics.DateOfBirth, identifier);
-                var authConfirmRequest = new AuthConfirmRequest(null, healthId, demographics);
+                var authConfirmRequest = new AuthConfirmRequest(null, ndhmDemographics.HealthId, demographics);
                 request.Content = new StringContent(JsonConvert.SerializeObject(authConfirmRequest),
                     Encoding.UTF8, "application/json");
                 await httpClient.SendAsync(request).ConfigureAwait(false);
-                Log.Information(request.ToString());
             }
             catch (Exception)
             {

@@ -22,7 +22,7 @@ namespace In.ProjectEKA.HipService.UserAuth
             OnAuthConfirmRequest onAuthConfirmRequest);
 
         public Task Dump(NdhmDemographics ndhmDemographics);
-        public Task CallAuthConfirm(string healthId);
+        public Task CallAuthConfirm(NdhmDemographics ndhmDemographics);
         public Task CallAuthInit(string healthId);
     }
 }

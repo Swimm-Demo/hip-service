@@ -394,11 +394,11 @@ namespace In.ProjectEKA.HipService.UserAuth
             await userAuthService.Dump(ndhmDemographics);
         }
 
-        [Route(PATH_ADD_TOKEN)]
-        public async Task AddAuthToken(string healthId)
+        [Route(PATH_DEMOGRAPHICS)]
+        public async Task DemographicAuth([FromBody] NdhmDemographics ndhmDemographics)
         {
-            await userAuthService.CallAuthInit(healthId);
-            await userAuthService.CallAuthConfirm(healthId);
+            await userAuthService.CallAuthInit(ndhmDemographics.HealthId);
+            await userAuthService.CallAuthConfirm(ndhmDemographics);
         }
     }
 }

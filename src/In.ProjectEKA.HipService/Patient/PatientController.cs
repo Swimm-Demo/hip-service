@@ -74,7 +74,7 @@ namespace In.ProjectEKA.HipService.Patient
                 correlationId);
             if (error == null)
             {
-                await _patientProfileService.linkToken(shareProfileRequest.Profile.PatientDemographics.HealthId);
+                await _patientProfileService.linkToken(shareProfileRequest.Profile.PatientDemographics);
                 return Accepted();
             }
             return BadRequest();

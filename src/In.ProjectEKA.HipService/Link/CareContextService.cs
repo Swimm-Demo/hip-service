@@ -13,6 +13,7 @@ using In.ProjectEKA.HipService.OpenMrs;
 using In.ProjectEKA.HipService.UserAuth;
 using In.ProjectEKA.HipService.UserAuth.Model;
 using Newtonsoft.Json;
+using Optional.Unsafe;
 using HiType = In.ProjectEKA.HipService.Common.Model.HiType;
 
 namespace In.ProjectEKA.HipService.Link
@@ -89,7 +90,10 @@ namespace In.ProjectEKA.HipService.Link
         {
             var (healthId, exception) =
                 await linkPatientRepository.GetHealthID(patientReferenceNumber);
-            var request = new HttpRequestMessage(HttpMethod.Get,  helper.getHipUrl() + PATH_ADD_TOKEN + "?healthId=" + healthId);
+            var demographics = (userAuthRepository.GetDemographics(healthId).Result).ValueOrDefault();
+            var request = new HttpRequestMessage(HttpMethod.Post,  helper.getHipUrl() + PATH_DEMOGRAPHICS);
+            request.Content = new StringContent(JsonConvert.SerializeObject(demographics), Encoding.UTF8,
+                "application/json");
             await httpClient.SendAsync(request).ConfigureAwait(false);
             if (!UserAuthMap.HealthIdToAccessToken.TryGetValue(healthId, out _))
             {
