@@ -393,5 +393,12 @@ namespace In.ProjectEKA.HipService.UserAuth
             var ndhmDemographics = new NdhmDemographics(healthId, name, gender, dateOfBirth, phoneNumber);
             await userAuthService.Dump(ndhmDemographics);
         }
+
+        [Route(PATH_ADD_TOKEN)]
+        public async Task AddAuthToken(string healthId)
+        {
+            await userAuthService.CallAuthInit(healthId);
+            await userAuthService.CallAuthConfirm(healthId);
+        }
     }
 }
