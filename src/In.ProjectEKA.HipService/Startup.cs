@@ -290,7 +290,7 @@ namespace In.ProjectEKA.HipService
 
         private static bool CheckRoleInAccessToken(JwtSecurityToken accessToken)
         {
-            if (!(accessToken.Payload["realm_access"] is JObject resourceAccess))
+            if (!(JsonConvert.DeserializeObject(accessToken.Payload["realm_access"].ToString()) is JObject resourceAccess))
                 return false;
             var token = new Token(resourceAccess["roles"]?.ToObject<List<string>>() ?? new List<string>());
             return token.Roles.Contains("gateway", StringComparer.OrdinalIgnoreCase);
