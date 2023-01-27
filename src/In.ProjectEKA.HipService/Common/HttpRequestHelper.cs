@@ -29,7 +29,7 @@ namespace In.ProjectEKA.HipService.Common
                 }
             });
             
-            var httpRequestMessage = new HttpRequestMessage(HttpMethod.Post, new Uri($"{url}"))
+            var httpRequestMessage = new HttpRequestMessage(method, new Uri($"{url}"))
             {
                 Content = new StringContent(json, Encoding.UTF8, MediaTypeNames.Application.Json)
             };
