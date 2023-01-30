@@ -85,7 +85,10 @@ namespace In.ProjectEKA.HipService.Creation
                         {
                             TxnDictionary[sessionId] = generationResponse?.txnId;
                         }
-                        TxnDictionary.Add(sessionId, generationResponse?.txnId);
+                        else
+                        {
+                            TxnDictionary.Add(sessionId, generationResponse?.txnId);
+                        }
                         return Accepted(new AadhaarOTPGenerationResponse(generationResponse?.mobileNumber));
                     }
                     return StatusCode((int)response.StatusCode,responseContent);
