@@ -79,8 +79,20 @@ namespace In.ProjectEKA.HipService.Common
         public const string AADHAAR_VERIFY_OTP = "/" + VERSION_V2 + "/registration/aadhaar/verifyOTP";  
         public const string CHECK_GENERATE_MOBILE_OTP = "/" + VERSION_V2 + "/registration/aadhaar/checkAndGenerateMobileOTP";
         public const string VERIFY_MOBILE_OTP = "/" + VERSION_V2 + "/registration/aadhaar/verifyMobileOTP";
-        public const string CREATE_ABHA_ID = "/" + VERSION_V1 +"/registration/aadhaar/createHealthIdWithPreVerified";
+        public const string CREATE_ABHA_ID = "/" + VERSION_V2 + "/registration/aadhaar/createHealthIdByAdhaar";
         public const string GET_ABHA_CARD =  "/" + VERSION_V2 + "/account/getPngCard";
+        public const string ABHA_PATIENT_PROFILE = "/" + VERSION_V2 + "/account/profile";
+        public const string CREATE_PHR = "/" + VERSION_V2 + "/account/phr-linked";
 
+        public const string PUBLIC_CERT = "/" + VERSION_V1 + "/phr/public/certificate";
+        public const string MOBILE_EMAIL_INIT = "/" + VERSION_V1 + "/phr/login/mobileEmail/init";
+        public const string MOBILE_EMAIL_PRE_VERIFICATION = "/" + VERSION_V1 + "/phr/login/mobileEmail/preVerification";
+        public const string MOBILE_EMAIL_GET_USERTOKEN = "/" + VERSION_V1 + "/phr/login/mobileEmail/getUserToken";
+        public const string LINK_PHR_ADDRESS = "/" + VERSION_V1 + "/phr/profile/link/hid";
+        public const string AUTH_MODE_FOR_HEALTH_ID = "/" + VERSION_V1 + "/phr/registration/hid/search/auth-methods";
+        public const string TRANSACTION_INIT = "/" + VERSION_V1 + "/phr/login/init/transaction";
+        public const string ABHA_ADDRESS_PROFILE = "/" + VERSION_V1 + "/phr/profile";
+        public const string X_TOKEN_TYPE = "Bearer";
+        
     }
 }

@@ -146,6 +146,15 @@ namespace In.ProjectEKA.HipService.Creation
                     {
                         var otpResponse = JsonConvert.DeserializeObject<AadhaarOTPVerifyResponse>(responseContent);
                         TxnDictionary[sessionId] = otpResponse?.txnId;
+                        if (otpResponse.healthIdNumber != null)
+                        {
+                            var profile = await getABHAProfile(sessionId,new TokenRequest(otpResponse.jwtResponse.token));
+                            if (profile != null)
+                            {
+                                otpResponse.phrAddress = profile.phrAddress;
+                                otpResponse.phone = profile.mobile;
+                            }
+                        }
                         return Accepted(otpResponse);
                     }
                     return StatusCode((int)response.StatusCode,responseContent);
@@ -302,14 +311,17 @@ namespace In.ProjectEKA.HipService.Creation
                                         $"txnId: {{txnId}}",
                     correlationId,txnId);
                 using (var response = await gatewayClient.CallABHAService(HttpMethod.Post,gatewayConfiguration.AbhaNumberServiceUrl, CREATE_ABHA_ID,
-                    new CreateABHARequest(createAbhaRequest.healthId,txnId), correlationId))
+                    new CreateABHARequest(txnId), correlationId))
                 {
                     var responseContent = await response?.Content.ReadAsStringAsync();
 
                     if (response.IsSuccessStatusCode)
                     {
                         var createAbhaResponse = JsonConvert.DeserializeObject<CreateABHAResponse>(responseContent);
-                        return Accepted(createAbhaResponse);
+                        var profile = await getABHAProfile(sessionId, new TokenRequest(createAbhaResponse.token));
+                        if(profile == null)
+                            return StatusCode(StatusCodes.Status500InternalServerError);
+                        return Accepted(profile);
                     }
                     return StatusCode((int)response.StatusCode,responseContent);
                 }
@@ -324,15 +336,64 @@ namespace In.ProjectEKA.HipService.Creation
             return StatusCode(StatusCodes.Status500InternalServerError);
         }
         
-        [Route(GET_ABHA_CARD)]
-        public async Task<IActionResult> getPngCard(
-            [FromHeader(Name = CORRELATION_ID)] string correlationId, ABHACardRequest abhaCardRequest)
+        [Route(Constants.CREATE_PHR)]
+        public async Task<ActionResult> CreateABHAAddress(
+            [FromHeader(Name = CORRELATION_ID)] string correlationId, CreateABHAAddressRequest createAbhaRequest)
         {
+            string sessionId = null;
             if (Request != null)
             {
                 if (Request.Cookies.ContainsKey(REPORTING_SESSION))
                 {
-                    string sessionId = Request.Cookies[REPORTING_SESSION];
+                    sessionId = Request.Cookies[REPORTING_SESSION];
+            
+                    Task<StatusCodeResult> statusCodeResult = IsAuthorised(sessionId);
+                    if (!statusCodeResult.Result.StatusCode.Equals(StatusCodes.Status200OK))
+                    {
+                        return statusCodeResult.Result;
+                    }
+                }
+                else
+                {
+                    return StatusCode(StatusCodes.Status401Unauthorized);
+                }
+            }
+            
+            try
+            {
+                logger.Log(LogLevel.Information,
+                    LogEvents.Creation, $"Request for create ABHA-Address to gateway:  correlationId: {{correlationId}}",
+                    correlationId);
+                using (var response = await gatewayClient.CallABHAService(HttpMethod.Post,gatewayConfiguration.AbhaNumberServiceUrl, CREATE_PHR,
+                    createAbhaRequest, correlationId, $"{HealthIdNumberTokenDictionary[sessionId].tokenType} {HealthIdNumberTokenDictionary[sessionId].token}"))
+                {
+                    if (response.IsSuccessStatusCode)
+                    {
+                        return Accepted();
+                    }
+                    var responseContent = await response?.Content.ReadAsStringAsync();
+                    return StatusCode((int)response.StatusCode,responseContent);
+                }
+            }
+            catch (Exception exception)
+            {
+                logger.LogError(LogEvents.Creation, exception, "Error happened for create ABHA Address");
+                
+            }
+            
+            return StatusCode(StatusCodes.Status500InternalServerError);
+        }
+        
+        [Route(GET_ABHA_CARD)]
+        public async Task<IActionResult> getPngCard(
+            [FromHeader(Name = CORRELATION_ID)] string correlationId)
+        {
+            string sessionId = null;
+            if (Request != null)
+            {
+                if (Request.Cookies.ContainsKey(REPORTING_SESSION))
+                {
+                    sessionId = Request.Cookies[REPORTING_SESSION];
             
                     Task<StatusCodeResult> statusCodeResult = IsAuthorised(sessionId);
                     if (!statusCodeResult.Result.StatusCode.Equals(StatusCodes.Status200OK))
@@ -353,8 +414,8 @@ namespace In.ProjectEKA.HipService.Creation
                     LogEvents.Creation, $"Request for abha-card to gateway:  correlationId: {{correlationId}}",
                     correlationId);
 
-                var response = await gatewayClient.CallABHAService<string>(HttpMethod.Get, gatewayConfiguration.AbhaNumberServiceUrl,GET_ABHA_CARD,
-                    null, correlationId, $"{abhaCardRequest.tokenType} {abhaCardRequest.token}");
+                var response = await gatewayClient.CallABHAService<string>(HttpMethod.Get, gatewayConfiguration.AbhaNumberServiceUrl, GET_ABHA_CARD,
+                    null, correlationId, $"{HealthIdNumberTokenDictionary[sessionId].tokenType} {HealthIdNumberTokenDictionary[sessionId].token}");
                 var stream = await response.Content.ReadAsStreamAsync();
                 return File(stream,"image/png");
                 
@@ -365,6 +426,44 @@ namespace In.ProjectEKA.HipService.Creation
                 
             }
             return StatusCode(StatusCodes.Status500InternalServerError);
+        }
+        
+        private async Task<ABHAProfile> getABHAProfile(string sessionId, TokenRequest tokenRequest)
+        {
+            
+            try
+            {
+                logger.Log(LogLevel.Information,
+                    LogEvents.Creation, "Request for ABHA-patient-profile to gateway");
+                if (HealthIdNumberTokenDictionary.ContainsKey(sessionId))
+                {
+                    HealthIdNumberTokenDictionary[sessionId] = tokenRequest;
+                }
+                else
+                {
+                    HealthIdNumberTokenDictionary.Add(sessionId, tokenRequest);
+                }
+                using (var response = await gatewayClient.CallABHAService<string>(HttpMethod.Get, gatewayConfiguration.AbhaNumberServiceUrl,ABHA_PATIENT_PROFILE,
+                null, null,$"{tokenRequest.tokenType} {tokenRequest.token}" ))
+                {
+                    var responseContent = await response?.Content.ReadAsStringAsync();
+
+                    if (response.IsSuccessStatusCode)
+                    {
+                        var createAbhaResponse = JsonConvert.DeserializeObject<ABHAProfile>(responseContent);
+                        return createAbhaResponse;
+                    }
+                    logger.LogError(LogEvents.Creation, "Error happened for ABHA patient profile with error response" + responseContent);
+                    return null;
+                }
+                
+            }
+            catch (Exception exception)
+            {
+                logger.LogError(LogEvents.Creation, exception, "Error happened for ABHA patient profile");
+                
+            }
+            return null;
         }
         
         [NonAction]
