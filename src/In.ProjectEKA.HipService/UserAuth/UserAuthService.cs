@@ -118,6 +118,40 @@ namespace In.ProjectEKA.HipService.UserAuth
             return new ErrorRepresentation(new Error(ErrorCode.GatewayTimedOut, "Gateway timed out"));
         }
 
+        public Tuple<AuthConfirmPatient, ErrorRepresentation> GetPatientDetailsForDirectAuth(
+            string healthId, GatewayConfiguration gatewayConfiguration)
+        {
+                var i = 0;
+                do
+                {
+                    Thread.Sleep(gatewayConfiguration.TimeOut);
+                    if (UserAuthMap.HealthIdToTransactionId.ContainsKey(healthId))
+                    {
+                        var transactionId =
+                            Guid.Parse(UserAuthMap.HealthIdToTransactionId[healthId]);
+                        if (UserAuthMap.TransactionIdToAuthNotifyStatus.ContainsKey(transactionId))
+                        {
+                            if (UserAuthMap.TransactionIdToAuthNotifyStatus[transactionId] ==
+                                AuthNotifyStatus.GRANTED)
+                            {
+                                var patient = UserAuthMap.TransactionIdToPatientDetails[transactionId];
+                                return new Tuple<AuthConfirmPatient, ErrorRepresentation>(patient, null);
+                            }
+                            if (UserAuthMap.TransactionIdToAuthNotifyStatus[transactionId] ==
+                                AuthNotifyStatus.DENIED)
+                            {
+                                return new Tuple<AuthConfirmPatient, ErrorRepresentation>(null,
+                                    new ErrorRepresentation(new Error(ErrorCode.ConsentNotGranted, "Consent Denied")));
+                            }
+                        }
+                    }
+                    i++;
+                } while (i < gatewayConfiguration.Counter);
+                return new Tuple<AuthConfirmPatient, ErrorRepresentation>(null,
+                new ErrorRepresentation(new Error(ErrorCode.ConsentNotGranted, "Consent Not Approved")));
+        }
+
+
         private Tuple<GatewayAuthInitRequestRepresentation, ErrorRepresentation> AuthInitResponse(
             AuthInitRequest authInitRequest, BahmniConfiguration bahmniConfiguration)
         {
@@ -285,6 +319,32 @@ namespace In.ProjectEKA.HipService.UserAuth
 
             UserAuthMap.RequestIdToPatientDetails.Add(requestId, onAuthConfirmRequest.auth.patient);
             return new Tuple<AuthConfirm, ErrorRepresentation>(authConfirm, null);
+        }
+
+        public async Task<ErrorRepresentation> AuthNotify(AuthNotifyRequest request)
+        {
+            if (UserAuthMap.TransactionIdToAuthNotifyStatus.ContainsKey(Guid.Parse(request.auth.transactionId)))
+            {
+                return new ErrorRepresentation(new Error(ErrorCode.BadRequest, "Duplicate Transaction Id"));
+            }
+            UserAuthMap.TransactionIdToAuthNotifyStatus.Add(Guid.Parse(request.auth.transactionId),request.auth.status);
+            if (request.auth.status == AuthNotifyStatus.GRANTED)
+            {
+                UserAuthMap.TransactionIdToPatientDetails.Add(Guid.Parse(request.auth.transactionId), request.auth.patient);
+                var healthId = request.auth.patient.id;
+                var authConfirm = new AuthConfirm(healthId, request.auth.accessToken);
+                var savedAuthConfirm = userAuthRepository.Get(healthId).Result;
+                if (savedAuthConfirm.Equals(Option.Some<AuthConfirm>(null)))
+                {
+                    await userAuthRepository.Add(authConfirm).ConfigureAwait(false);
+                }
+                else
+                {
+                    userAuthRepository.Update(authConfirm);
+                }
+            }
+
+            return null;
         }
 
         public async Task Dump(NdhmDemographics ndhmDemographics)
