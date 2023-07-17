@@ -66,6 +66,7 @@ namespace In.ProjectEKA.HipService.Common
         public const string REPORTING_SESSION = "reporting_session";
         public const string OPENMRS_SESSION_ID_COOKIE_NAME = "JSESSIONID";
         public const string WHO_AM_I = "/ws/rest/v1/bahmnicore/whoami";
+        public const string SESSION_ID = "session_id";
 
         public const string MOBILE = "MOBILE";
 
@@ -103,6 +104,7 @@ namespace In.ProjectEKA.HipService.Common
         public const string ABHA_ADDRESS_PROFILE = "/" + VERSION_V1 + "/phr/profile";
         public const string CHECK_ABHA_ADDRESS = "/" + VERSION_V1 + "/phr/search/isExist";
         public const string X_TOKEN_TYPE = "Bearer";
+        public const string AUTHORIZATION = "Authorization";
         
     }
 }
