@@ -168,10 +168,10 @@ namespace In.ProjectEKA.HipService.Consent
 
 ## Database Migrations
 
-The <SwmToken path="src/In.ProjectEKA.HipService/Consent/Database/Migrations/20200403080416_addConsentManagerIdenitifier.cs" pos="1:9:9" line-data="﻿namespace In.ProjectEKA.HipService.Consent.Database.Migrations">`Consent`</SwmToken> class is also used in various database migration files, such as `20200403080416_addConsentManagerIdenitifier` and `20200212205522_AddConsentArtefactTable`. These migrations likely involve creating or modifying database tables related to consent artefacts.
+The <SwmToken path="/src/In.ProjectEKA.HipService/Consent/Database/Migrations/20200403080416_addConsentManagerIdenitifier.cs" pos="1:8:8" line-data="namespace In.ProjectEKA.HipService.Consent.Database.Migrations">`Consent`</SwmToken> class is also used in various database migration files, such as `20200403080416_addConsentManagerIdenitifier` and `20200212205522_AddConsentArtefactTable`. These migrations likely involve creating or modifying database tables related to consent artefacts.
 
 ```c#
-﻿namespace In.ProjectEKA.HipService.Consent.Database.Migrations
+namespace In.ProjectEKA.HipService.Consent.Database.Migrations
 {
     using Microsoft.EntityFrameworkCore.Migrations;
 ```
@@ -287,4 +287,4 @@ In the <SwmToken path="src/In.ProjectEKA.HipService/Consent/ConsentNotificationC
 
 *This is an auto-generated document by Swimm 🌊 and has not yet been verified by a human*
 
-<SwmMeta version="3.0.0" repo-id="Z2l0aHViJTNBJTNBaGlwLXNlcnZpY2UlM0ElM0FTd2ltbS1EZW1v" repo-name="hip-service"><sup>Powered by [Swimm](/)</sup></SwmMeta>
+<SwmMeta version="3.0.0" repo-id="Z2l0aHViJTNBJTNBaGlwLXNlcnZpY2UlM0ElM0FTd2ltbS1EZW1v" repo-name="hip-service"><sup>Powered by [Swimm](https://app.swimm.io/)</sup></SwmMeta>

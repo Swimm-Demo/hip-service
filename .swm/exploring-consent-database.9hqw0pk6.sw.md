@@ -27,10 +27,10 @@ The <SwmToken path="src/In.ProjectEKA.HipService/Consent/Database/ConsentContext
 
 ---
 
-Migrations are used to manage changes to the database schema over time. The <SwmToken path="src/In.ProjectEKA.HipService/Link/Database/Migrations/20200419184602_IntiatedLinkRequest.cs" pos="1:13:13" line-data="﻿namespace In.ProjectEKA.HipService.Link.Database.Migrations">`Migrations`</SwmToken> folder contains classes that represent these migrations, such as <SwmToken path="src/In.ProjectEKA.HipService/Link/Database/Migrations/20200419184602_IntiatedLinkRequest.cs" pos="5:7:7" line-data="    public partial class IntiatedLinkRequest : Migration">`IntiatedLinkRequest`</SwmToken> and `LinkRequestMigrations`. These classes define the operations to be performed on the database schema, such as creating or altering tables.
+Migrations are used to manage changes to the database schema over time. The <SwmToken path="/src/In.ProjectEKA.HipService/Link/Database/Migrations/20200419184602_IntiatedLinkRequest.cs" pos="1:12:12" line-data="namespace In.ProjectEKA.HipService.Link.Database.Migrations">`Migrations`</SwmToken> folder contains classes that represent these migrations, such as <SwmToken path="src/In.ProjectEKA.HipService/Link/Database/Migrations/20200419184602_IntiatedLinkRequest.cs" pos="5:7:7" line-data="    public partial class IntiatedLinkRequest : Migration">`IntiatedLinkRequest`</SwmToken> and `LinkRequestMigrations`. These classes define the operations to be performed on the database schema, such as creating or altering tables.
 
 ```c#
-﻿namespace In.ProjectEKA.HipService.Link.Database.Migrations
+namespace In.ProjectEKA.HipService.Link.Database.Migrations
 ```
 
 ---
@@ -77,4 +77,4 @@ The <SwmToken path="src/In.ProjectEKA.HipService/Consent/Database/ConsentContext
 
 *This is an auto-generated document by Swimm 🌊 and has not yet been verified by a human*
 
-<SwmMeta version="3.0.0" repo-id="Z2l0aHViJTNBJTNBaGlwLXNlcnZpY2UlM0ElM0FTd2ltbS1EZW1v" repo-name="hip-service"><sup>Powered by [Swimm](/)</sup></SwmMeta>
+<SwmMeta version="3.0.0" repo-id="Z2l0aHViJTNBJTNBaGlwLXNlcnZpY2UlM0ElM0FTd2ltbS1EZW1v" repo-name="hip-service"><sup>Powered by [Swimm](https://app.swimm.io/)</sup></SwmMeta>
